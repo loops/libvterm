@@ -279,6 +279,7 @@ INTERNAL void vterm_state_setpen(VTermState *state, const long args[], int argco
       break;
 
     case 22: // Bold off
+      state->fg_index = -1;
       state->pen.bold = 0;
       setpenattr_bool(state, VTERM_ATTR_BOLD, 0);
       break;
