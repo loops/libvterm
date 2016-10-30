@@ -279,7 +279,8 @@ INTERNAL void vterm_state_setpen(VTermState *state, const long args[], int argco
       break;
 
     case 22: // Bold off
-      state->fg_index = -1;
+      if(state->fg_index > -1 && state->fg_index < 8 && state->bold_is_highbright)
+        set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, state->fg_index);
       state->pen.bold = 0;
       setpenattr_bool(state, VTERM_ATTR_BOLD, 0);
       break;
