@@ -161,6 +161,7 @@ between states.
 
 123   SGR 0            = Reset
 123   SGR 1            = Bold on
+      SGR 2            = Dim/Faint on
       SGR 3            = Italic on
 123   SGR 4            = Underline single
 123   SGR 5            = Blink on
@@ -168,7 +169,7 @@ between states.
       SGR 9            = Strikethrough on
       SGR 10-19        = Select font
       SGR 21           = Underline double
- 23   SGR 22           = Bold off
+ 23   SGR 22           = Normal intensity (Bold & Dim off)
       SGR 23           = Italic off
  23   SGR 24           = Underline off
  23   SGR 25           = Blink off

@@ -22,6 +22,7 @@ typedef struct
   unsigned int reverse   : 1;
   unsigned int strike    : 1;
   unsigned int font      : 4; /* 0 to 9 */
+  unsigned int dim       : 1;
 
   /* Extra state storage that isn't strictly pen-related */
   unsigned int protected_cell : 1;
@@ -426,6 +427,9 @@ static int setpenattr(VTermAttr attr, VTermValue *val, void *user)
   case VTERM_ATTR_BACKGROUND:
     screen->pen.bg = val->color;
     return 1;
+  case VTERM_ATTR_DIM:
+    screen->pen.dim = val->boolean;
+    return 1;
   }
 
   return 0;
@@ -750,6 +754,7 @@ int vterm_screen_get_cell(const VTermScreen *screen, VTermPos pos, VTermScreenCe
   cell->attrs.reverse   = intcell->pen.reverse ^ screen->global_reverse;
   cell->attrs.strike    = intcell->pen.strike;
   cell->attrs.font      = intcell->pen.font;
+  cell->attrs.dim       = intcell->pen.dim;
 
   cell->attrs.dwl = intcell->pen.dwl;
   cell->attrs.dhl = intcell->pen.dhl;
@@ -787,6 +792,7 @@ static int vterm_screen_set_cell(VTermScreen *screen, VTermPos pos, const VTermS
   intcell->pen.reverse   = cell->attrs.reverse ^ screen->global_reverse;
   intcell->pen.strike    = cell->attrs.strike;
   intcell->pen.font      = cell->attrs.font;
+  intcell->pen.dim       = cell->attrs.dim;
 
   intcell->pen.fg = cell->fg;
   intcell->pen.bg = cell->bg;
@@ -894,6 +900,8 @@ static int attrs_differ(VTermAttrMask attrs, ScreenCell *a, ScreenCell *b)
   if((attrs & VTERM_ATTR_FOREGROUND_MASK) && !vterm_color_equal(a->pen.fg, b->pen.fg))
     return 1;
   if((attrs & VTERM_ATTR_BACKGROUND_MASK) && !vterm_color_equal(a->pen.bg, b->pen.bg))
+    return 1;
+  if((attrs & VTERM_ATTR_DIM_MASK)        && (a->pen.dim != b->pen.dim))
     return 1;
 
   return 0;

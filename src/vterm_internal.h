@@ -39,6 +39,7 @@ struct VTermPen
   unsigned int reverse:1;
   unsigned int strike:1;
   unsigned int font:4; /* To store 0-9 */
+  unsigned int dim:1;
 };
 
 static inline int vterm_color_equal(VTermColor a, VTermColor b)

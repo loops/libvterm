@@ -161,6 +161,7 @@ INTERNAL void vterm_state_resetpen(VTermState *state)
   state->pen.reverse = 0;   setpenattr_bool(state, VTERM_ATTR_REVERSE, 0);
   state->pen.strike = 0;    setpenattr_bool(state, VTERM_ATTR_STRIKE, 0);
   state->pen.font = 0;      setpenattr_int( state, VTERM_ATTR_FONT, 0);
+  state->pen.dim = 0;       setpenattr_bool(state, VTERM_ATTR_DIM, 0);
 
   state->fg_index = -1;
   state->bg_index = -1;
@@ -185,6 +186,7 @@ INTERNAL void vterm_state_savepen(VTermState *state, int save)
     setpenattr_int( state, VTERM_ATTR_FONT,       state->pen.font);
     setpenattr_col( state, VTERM_ATTR_FOREGROUND, state->pen.fg);
     setpenattr_col( state, VTERM_ATTR_BACKGROUND, state->pen.bg);
+    setpenattr_bool(state, VTERM_ATTR_DIM,        state->pen.dim);
   }
 }
 
@@ -238,8 +240,17 @@ INTERNAL void vterm_state_setpen(VTermState *state, const long args[], int argco
     case 1: // Bold on
       state->pen.bold = 1;
       setpenattr_bool(state, VTERM_ATTR_BOLD, 1);
+      state->pen.dim = 0;
+      setpenattr_bool(state, VTERM_ATTR_DIM, 0);
       if(state->fg_index > -1 && state->fg_index < 8 && state->bold_is_highbright)
         set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, state->fg_index + (state->pen.bold ? 8 : 0));
+      break;
+
+    case 2: // Dim on
+      state->pen.dim = 1;
+      setpenattr_bool(state, VTERM_ATTR_DIM, 1);
+      state->pen.bold = 0;
+      setpenattr_bool(state, VTERM_ATTR_BOLD, 0);
       break;
 
     case 3: // Italic on
@@ -278,11 +289,13 @@ INTERNAL void vterm_state_setpen(VTermState *state, const long args[], int argco
       setpenattr_int(state, VTERM_ATTR_UNDERLINE, 2);
       break;
 
-    case 22: // Bold off
+    case 22: // Normal text; Dim off, Bold off
       if(state->fg_index > -1 && state->fg_index < 8 && state->bold_is_highbright)
         set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, state->fg_index);
       state->pen.bold = 0;
+      state->pen.dim = 0;
       setpenattr_bool(state, VTERM_ATTR_BOLD, 0);
+      setpenattr_bool(state, VTERM_ATTR_DIM, 0);
       break;
 
     case 23: // Italic and Gothic (currently unsupported) off
@@ -468,6 +481,10 @@ int vterm_state_get_penattr(const VTermState *state, VTermAttr attr, VTermValue 
 
   case VTERM_ATTR_BACKGROUND:
     val->color = state->pen.bg;
+    return 1;
+
+  case VTERM_ATTR_DIM:
+    val->boolean = state->pen.dim;
     return 1;
   }
 
